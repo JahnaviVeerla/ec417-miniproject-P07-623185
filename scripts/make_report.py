@@ -119,7 +119,8 @@ def main() -> None:
         fig.text(.07, .915, "Wine Quality Classification — Final Results", fontsize=14, color="#365f91")
         fig.text(.07, .865, "Problem and metric", fontsize=13, weight="bold")
         problem_text = textwrap.fill(
-            f"Predict quality ≥ 7 from physicochemical measures in red and white Vinho Verde wines. "
+            f"Predict quality ≥ 7 from physicochemical measures in red and white Vinho Verde wines; "
+            "this tests how lab measures proxy subjective sensory judgments. "
             f"Only {dataset['good_wine_rate_after']:.1%} of cleaned rows are positive, so PR-AUC "
             "(average precision) is primary: it foregrounds positive-class retrieval and reflects the "
             "low base rate. Balanced accuracy is also reported, but its value at a fixed 0.5 cutoff "

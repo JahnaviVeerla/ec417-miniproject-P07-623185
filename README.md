@@ -4,7 +4,7 @@
 
 ## 2. Problem, motivation, and metric
 
-The task is to identify wines with sensory quality at least 7 from physicochemical measurements. This is a useful imbalanced-classification exercise, not a basis for commercial or consumer decisions. The positive class is 19.0% of the cleaned data, so PR-AUC (average precision) is the primary ranking metric: it focuses attention on positive-class retrieval and has a prevalence-dependent baseline. ROC-AUC is reported as a complementary ranking measure.
+The task is to identify wines with sensory quality at least 7 from physicochemical measurements. It is a compact way to study how objective lab measures act as proxies for subjective sensory judgments, and where that proxy may fail. This is an educational imbalanced-classification exercise, not a basis for commercial or consumer decisions. The positive class is 19.0% of the cleaned data, so PR-AUC (average precision) is the primary ranking metric: it focuses attention on positive-class retrieval and has a prevalence-dependent baseline. ROC-AUC is reported as a complementary ranking measure.
 
 Balanced accuracy gives equal weight to sensitivity and specificity, but its value at a fixed 0.5 cutoff is not a threshold-independent model comparison. RF's mean BA is 0.638 at 0.5 versus 0.783 at the validation-selected threshold: 0.5 is an arbitrary operating point for these scores, not a summary of their ranking quality. The implementation uses `class_weight="balanced_subsample"` (so it is not an unweighted forest), and scores are not assumed calibrated. We therefore report both the 0.5 result and balanced accuracy at a threshold selected using validation only.
 
