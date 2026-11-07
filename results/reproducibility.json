@@ -4,5 +4,10 @@
   "platform": "Linux-4.18.0-514.el8.x86_64-x86_64-with-glibc2.28",
   "cpu_count": 32,
   "memory_gib": 30.795249938964844,
-  "command": "git clone --no-hardlinks; python3 -m venv .venv; .venv/bin/pip install -r requirements.txt; ./run_all.sh"
+  "command": "git clone --no-hardlinks; python3 -m venv .venv; .venv/bin/pip install -r requirements.txt; ./run_all.sh",
+  "python_311_requirements_install": {
+    "python_version": "3.11.4",
+    "status": "failed",
+    "reason": "Pinned contourpy==1.4.0 is incompatible: pip reports Requires-Python >=3.12"
+  }
 }

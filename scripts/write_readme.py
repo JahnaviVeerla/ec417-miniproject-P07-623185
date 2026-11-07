@@ -8,6 +8,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
+REPOSITORY_URL = "https://github.com/JahnaviVeerla/ec417-miniproject-P07-623185.git"
 LABELS = {
     "trivial_prior": "Dummy prior",
     "logistic_regression": "Logistic regression",
@@ -174,14 +175,15 @@ def generate_readme() -> str:
     )
 
     model_rows = [model_row(metrics, model) for model in LABELS]
-    rf_ba_half = metrics[
-        (metrics["model"] == "random_forest")
-        & (metrics["metric"] == "balanced_accuracy_0.5")
-    ]["value"]
-    rf_ba_selected = metrics[
-        (metrics["model"] == "random_forest")
-        & (metrics["metric"] == "balanced_accuracy_val_threshold")
-    ]["value"]
+    ba_means = {
+        model: {
+            metric: float(metrics[
+                (metrics["model"] == model) & (metrics["metric"] == metric)
+            ]["value"].mean())
+            for metric in ("balanced_accuracy_0.5", "balanced_accuracy_val_threshold")
+        }
+        for model in ("logistic_regression", "random_forest", "gradient_boosting")
+    }
     result_table = table(
         ["Model", *METRIC_LABELS.values()],
         model_rows,
@@ -305,11 +307,26 @@ def generate_readme() -> str:
             f"{reproducibility['memory_gib']:.1f} GiB RAM; "
             f"{reproducibility['platform']}; Python {reproducibility['python_version']}."
         )
+        python_311_test = reproducibility.get("python_311_requirements_install")
     else:
         runtime = "not recorded yet for a clean-clone install-and-run"
         hardware = "See the measured fresh-clone run recorded in results/reproducibility.json."
+        python_311_test = None
 
-    return f"""    # 1. EC417 Mini Project P07 — Wine Quality Classification
+    if python_311_test:
+        python_compatibility = (
+            f"A fresh virtual environment using Python {python_311_test['python_version']} was tested; "
+            f"`pip install -r requirements.txt` {python_311_test['status']}. "
+            f"Reason: {python_311_test['reason']}. The full workflow was tested on Python "
+            f"{reproducibility['python_version']} only; compatibility with other versions is not claimed."
+        )
+    else:
+        python_compatibility = (
+            f"The full workflow was tested on Python {reproducibility['python_version']} only; "
+            "compatibility with other Python versions is not claimed."
+        )
+
+    return f"""# 1. EC417 Mini Project P07 — Wine Quality Classification
 
 **Headline:** On each of the {seed_count} held-out seeds, the random forest exceeded gradient boosting in PR-AUC; paired differences (RF − GB) were {per_seed_text}.
 
@@ -317,7 +334,7 @@ def generate_readme() -> str:
 
 The task is to identify wines with sensory quality at least 7 from physicochemical measurements. It is a compact way to study how objective lab measures act as proxies for subjective sensory judgments, and where that proxy may fail. This is an educational imbalanced-classification exercise, not a basis for commercial or consumer decisions. The positive class is {positive_rate:.1%} of the cleaned data, so PR-AUC (average precision) is the primary ranking metric: it focuses attention on positive-class retrieval and has a prevalence-dependent baseline. ROC-AUC is reported as a complementary ranking measure.
 
-Balanced accuracy gives equal weight to sensitivity and specificity, but its value at a fixed 0.5 cutoff is not a threshold-independent model comparison. RF's mean BA is {mean_sd(rf_ba_half)[0]:.3f} at 0.5 versus {mean_sd(rf_ba_selected)[0]:.3f} at the validation-selected threshold: 0.5 is an arbitrary operating point for these scores, not a summary of their ranking quality. The implementation uses `class_weight="balanced_subsample"` (so it is not an unweighted forest), and scores are not assumed calibrated. We therefore report both the 0.5 result and balanced accuracy at a threshold selected using validation only.
+Balanced accuracy averages sensitivity and specificity at a particular threshold. The BA @ 0.5 column applies the same fixed probability cutoff to every model; mean scores are LR {ba_means['logistic_regression']['balanced_accuracy_0.5']:.3f}, RF {ba_means['random_forest']['balanced_accuracy_0.5']:.3f}, and GB {ba_means['gradient_boosting']['balanced_accuracy_0.5']:.3f}. These are valid fixed-cutoff results, not each model's best operating point or a ranking metric. The validation-threshold column instead uses each model's threshold selected on validation (mean BA: LR {ba_means['logistic_regression']['balanced_accuracy_val_threshold']:.3f}, RF {ba_means['random_forest']['balanced_accuracy_val_threshold']:.3f}, GB {ba_means['gradient_boosting']['balanced_accuracy_val_threshold']:.3f}). The RF is class-weighted with `class_weight="balanced_subsample"`. Its probability scores were not calibrated to a 0.5 cutoff in this project. Calibration was not tested, so no cause for the difference is claimed; a reliability diagram would help assess calibration.
 
 ## 3. Data
 
@@ -412,27 +429,33 @@ Quality 6 or 7 accounts for {error['quality_6_or_7_errors']} of {error['errors']
 From a fresh clone, use the following commands. `run_all.sh` creates a virtual environment and installs the pinned requirements if `.venv` is absent; the explicit install command is shown for clarity.
 
 ```bash
-git clone <repository-url> ec417-miniproject-P07-623185
+git clone {REPOSITORY_URL}
 cd ec417-miniproject-P07-623185
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ./run_all.sh
 ```
 
-The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took {runtime}. Hardware/software: {hardware}
+The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took {runtime}. Hardware/software: {hardware} {python_compatibility}
+
+### Run on Google Colab
+
+The following commands are **untested on Colab**:
+
+```bash
+!git clone {REPOSITORY_URL}
+%cd ec417-miniproject-P07-623185
+!pip install -r requirements.txt
+!./run_all.sh
+```
 
 Useful outputs: `results/metrics.csv`, `results/predictions_seed*.csv`, `results/domain_shift_metrics.csv`, `results/error_analysis.json`, and `results/figures/`. To check the report/demo materials, see [demo outline](./report/demo_outline.md) and [viva questions](./docs/viva_questions.md).
 
 ## 9. AI-use statement
 
-OpenAI Codex generated the code scaffold, experiments, and draft text. Claude was used to review results and provide advice.
+The coding assistant was an AI assistant using Copilot SDK in VS Code. It helped create the code scaffold, run experiments, generate the README and report, and fix errors. Claude (Anthropic) was used to review results, spot issues (including the index-alignment bug and weighted-RF wording), and provide advice.
 
-> **TODO — personal verification (the author must complete this):**
-> - [ ] State which outputs, calculations, and claims I personally checked, and how.
-> - [ ] State what I changed after reviewing the AI-generated code and drafts.
-> - [ ] Confirm that the final report and viva answers reflect my own understanding.
-
-No personal verification is claimed here.
+> **TODO (student): list what I personally verified, for example the leakage-free split, the label/index alignment fix, the numbers in the results table, and the viva answers.**
 
 ## 10. References
 

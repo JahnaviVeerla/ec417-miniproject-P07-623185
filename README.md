@@ -1,4 +1,4 @@
-    # 1. EC417 Mini Project P07 — Wine Quality Classification
+# 1. EC417 Mini Project P07 — Wine Quality Classification
 
 **Headline:** On each of the 5 held-out seeds, the random forest exceeded gradient boosting in PR-AUC; paired differences (RF − GB) were seed 0: +0.021, seed 1: +0.037, seed 2: +0.050, seed 3: +0.034, seed 4: +0.031.
 
@@ -6,7 +6,7 @@
 
 The task is to identify wines with sensory quality at least 7 from physicochemical measurements. It is a compact way to study how objective lab measures act as proxies for subjective sensory judgments, and where that proxy may fail. This is an educational imbalanced-classification exercise, not a basis for commercial or consumer decisions. The positive class is 19.0% of the cleaned data, so PR-AUC (average precision) is the primary ranking metric: it focuses attention on positive-class retrieval and has a prevalence-dependent baseline. ROC-AUC is reported as a complementary ranking measure.
 
-Balanced accuracy gives equal weight to sensitivity and specificity, but its value at a fixed 0.5 cutoff is not a threshold-independent model comparison. RF's mean BA is 0.638 at 0.5 versus 0.783 at the validation-selected threshold: 0.5 is an arbitrary operating point for these scores, not a summary of their ranking quality. The implementation uses `class_weight="balanced_subsample"` (so it is not an unweighted forest), and scores are not assumed calibrated. We therefore report both the 0.5 result and balanced accuracy at a threshold selected using validation only.
+Balanced accuracy averages sensitivity and specificity at a particular threshold. The BA @ 0.5 column applies the same fixed probability cutoff to every model; mean scores are LR 0.759, RF 0.638, and GB 0.761. These are valid fixed-cutoff results, not each model's best operating point or a ranking metric. The validation-threshold column instead uses each model's threshold selected on validation (mean BA: LR 0.756, RF 0.783, GB 0.764). The RF is class-weighted with `class_weight="balanced_subsample"`. Its probability scores were not calibrated to a 0.5 cutoff in this project. Calibration was not tested, so no cause for the difference is claimed; a reliability diagram would help assess calibration.
 
 ## 3. Data
 
@@ -126,27 +126,33 @@ Quality 6 or 7 accounts for 222 of 268 errors (82.8%); other qualities account f
 From a fresh clone, use the following commands. `run_all.sh` creates a virtual environment and installs the pinned requirements if `.venv` is absent; the explicit install command is shown for clarity.
 
 ```bash
-git clone <repository-url> ec417-miniproject-P07-623185
+git clone https://github.com/JahnaviVeerla/ec417-miniproject-P07-623185.git
 cd ec417-miniproject-P07-623185
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ./run_all.sh
 ```
 
-The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took 383 seconds (6.4 minutes). Hardware/software: 32 logical CPUs, 30.8 GiB RAM; Linux-4.18.0-514.el8.x86_64-x86_64-with-glibc2.28; Python 3.14.7.
+The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took 383 seconds (6.4 minutes). Hardware/software: 32 logical CPUs, 30.8 GiB RAM; Linux-4.18.0-514.el8.x86_64-x86_64-with-glibc2.28; Python 3.14.7. A fresh virtual environment using Python 3.11.4 was tested; `pip install -r requirements.txt` failed. Reason: Pinned contourpy==1.4.0 is incompatible: pip reports Requires-Python >=3.12. The full workflow was tested on Python 3.14.7 only; compatibility with other versions is not claimed.
+
+### Run on Google Colab
+
+The following commands are **untested on Colab**:
+
+```bash
+!git clone https://github.com/JahnaviVeerla/ec417-miniproject-P07-623185.git
+%cd ec417-miniproject-P07-623185
+!pip install -r requirements.txt
+!./run_all.sh
+```
 
 Useful outputs: `results/metrics.csv`, `results/predictions_seed*.csv`, `results/domain_shift_metrics.csv`, `results/error_analysis.json`, and `results/figures/`. To check the report/demo materials, see [demo outline](./report/demo_outline.md) and [viva questions](./docs/viva_questions.md).
 
 ## 9. AI-use statement
 
-OpenAI Codex generated the code scaffold, experiments, and draft text. Claude was used to review results and provide advice.
+The coding assistant was an AI assistant using Copilot SDK in VS Code. It helped create the code scaffold, run experiments, generate the README and report, and fix errors. Claude (Anthropic) was used to review results, spot issues (including the index-alignment bug and weighted-RF wording), and provide advice.
 
-> **TODO — personal verification (the author must complete this):**
-> - [ ] State which outputs, calculations, and claims I personally checked, and how.
-> - [ ] State what I changed after reviewing the AI-generated code and drafts.
-> - [ ] Confirm that the final report and viva answers reflect my own understanding.
-
-No personal verification is claimed here.
+> **TODO (student): list what I personally verified, for example the leakage-free split, the label/index alignment fix, the numbers in the results table, and the viva answers.**
 
 ## 10. References
 
