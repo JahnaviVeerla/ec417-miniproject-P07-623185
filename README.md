@@ -1,78 +1,105 @@
-# EC417 Mini Project P07: Wine Quality Classification
+    # 1. EC417 Mini Project P07 — Wine Quality Classification
 
-This project predicts whether a wine is good (`quality >= 7`) from its physicochemical measurements. The results below are from fresh, reproducible model runs; the five-seed test summary is generated from `results/metrics.csv`.
+**Headline:** On each of the 5 held-out seeds, the random forest exceeded gradient boosting in PR-AUC; paired differences (RF − GB) were seed 0: +0.021, seed 1: +0.037, seed 2: +0.050, seed 3: +0.034, seed 4: +0.031.
 
-## Data cleaning and split
+## 2. Problem, motivation, and metric
 
-The UCI Wine Quality data contain 6,497 red and white wine rows before cleaning. Duplicate identity is computed over the 11 physicochemical features, quality score, and wine type:
+The task is to identify wines with sensory quality at least 7 from physicochemical measurements. This is a useful imbalanced-classification exercise, not a basis for commercial or consumer decisions. The positive class is 19.0% of the cleaned data, so PR-AUC (average precision) is the primary ranking metric: it focuses attention on positive-class retrieval and has a prevalence-dependent baseline. ROC-AUC is reported as a complementary ranking measure.
+
+Balanced accuracy gives equal weight to sensitivity and specificity, but its value at a fixed 0.5 cutoff is not a threshold-independent model comparison. RF's mean BA is 0.638 at 0.5 versus 0.783 at the validation-selected threshold: 0.5 is an arbitrary operating point for these scores, not a summary of their ranking quality. The implementation uses `class_weight="balanced_subsample"` (so it is not an unweighted forest), and scores are not assumed calibrated. We therefore report both the 0.5 result and balanced accuracy at a threshold selected using validation only.
+
+## 3. Data
+
+The red and white Vinho Verde wines are from the [UCI Wine Quality repository](https://archive.ics.uci.edu/dataset/186/wine+quality), introduced by Cortez et al. The repository lists the dataset under CC BY 4.0; see [LICENSE](./LICENSE) for this project's code license. The modeling data have 6,497 rows before exact de-duplication and 5,320 after. Good-wine prevalence is 19.7% before and 19.0% after cleaning.
 
 | Duplicate accounting | Rows |
 |---|---:|
-| Rows before cleaning | 6,497 |
-| Rows involved in any duplicate group (`keep=False`) | 2,169 |
+| Before cleaning | 6,497 |
+| Rows in any duplicate group (`keep=False`) | 2,169 |
 | Redundant rows removed (`keep="first"`) | 1,177 |
-| Rows after cleaning | 5,320 |
+| After cleaning | 5,320 |
 
-These are two different duplicate counts: 2,169 rows belong to repeated groups, while removing all but one row per group removes 1,177 rows. Splits are stratified on the pair `(good, is_red)` and use 60/20/20 train/validation/test partitions for seeds 0–4. Indices are saved in `results/split_seed{seed}.csv`.
+| Cleaned domain | Rows | Good wines | Good-wine rate |
+|---|---:|---:|---:|
+| Red | 1,359 | 184 | 13.5% |
+| White | 3,961 | 825 | 20.8% |
 
-## Model results
+Each seed stratifies a 60%/20%/20% train/validation/test split on `(good, is_red)`. Duplicate rows are removed before splitting. The saved split indices address the cleaned, reset-index dataset; no identical cleaned sample can occur in two partitions. Seeds used: 0, 1, 2, 3, 4.
 
-Models use the same cleaned dataset and seed-specific split. RF and gradient boosting each select among eight configurations by validation PR-AUC. For each fitted model, the operating threshold is selected on validation by balanced accuracy and fixed before test evaluation. Values are mean ± standard deviation across five held-out test sets.
+## 4. Method
 
-The models use the 11 physicochemical feature columns only. `is_red` is used for stratification, descriptive analysis, and the red/white transfer experiment; it is **not** a model input feature.
+The baseline is a dummy prior classifier; logistic regression is a linear reference. The main model is a random forest, compared with histogram gradient boosting. The one operating-point improvement is to select the classification threshold using validation balanced accuracy instead of assuming 0.5. Model configurations are chosen by validation PR-AUC; the test set is held out.
+
+```text
+Raw red + white rows
+        ↓ exact de-duplication (features + quality + wine type)
+Cleaned rows → stratified train / validation / test split
+        ↓ model selection by validation PR-AUC
+Validation-only threshold selection → one held-out test evaluation
+```
+
+The model inputs are the following 11 physicochemical columns: fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, alcohol. `is_red` is used for stratification, descriptive summaries, and transfer evaluation; **it is not a model feature**.
+
+Gradient boosting early stopping uses sklearn's internal validation split (`validation_fraction`), not the project's validation set. Project validation is still used for configuration selection and threshold choice. Early-stopping iterations by seed, read from `metrics.csv`: 0: 235, 1: 44, 2: 38, 3: 138, 4: 90 (38–235 iterations).
+
+## 5. Results
+
+Values below are mean ± sample standard deviation over the 5 seeds, read from `results/metrics.csv`. Fit time is the recorded final-model fit time, not the whole experiment runtime.
 
 | Model | BA @ 0.5 | BA @ validation threshold | ROC-AUC | PR-AUC | Fit time (s) |
-|---|---:|---:|---:|---:|---:|
-| Trivial prior | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.190 ± 0.000 | 0.001 ± 0.000 |
+| --- | --- | --- | --- | --- | --- |
+| Dummy prior | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.190 ± 0.000 | 0.001 ± 0.000 |
 | Logistic regression | 0.759 ± 0.013 | 0.756 ± 0.010 | 0.817 ± 0.008 | 0.499 ± 0.017 | 0.015 ± 0.001 |
-| Random forest | 0.638 ± 0.014 | **0.783 ± 0.011** | **0.847 ± 0.009** | **0.565 ± 0.018** | 2.701 ± 0.066 |
+| Random forest | 0.638 ± 0.014 | 0.783 ± 0.011 | 0.847 ± 0.009 | 0.565 ± 0.018 | 2.701 ± 0.066 |
 | Gradient boosting | 0.761 ± 0.011 | 0.764 ± 0.009 | 0.836 ± 0.006 | 0.531 ± 0.024 | 0.419 ± 0.135 |
 
-The random forest gives the best ranking metrics and validation-threshold balanced accuracy. Logistic regression has stronger BA at the default 0.5 cutoff than RF because class weighting changes its operating point; thresholds are therefore tuned on validation for the fair BA comparison.
+The RF beat GB in PR-AUC on every paired seed. Paired differences (RF − GB): seed 0: +0.021, seed 1: +0.037, seed 2: +0.050, seed 3: +0.034, seed 4: +0.031; mean ± SD: +0.035 ± 0.010. Possible explanations—not established causes—include the small de-duplicated dataset, noisy subjective sensory labels, unstable GB early stopping (38–235 trees across the recorded seeds), and the small tuning grid.
 
-### Gradient-boosting early stopping
+At the validation-chosen RF threshold (0.190), the seed-0 good-class precision/recall and confusion counts are shown below; the second line is mean ± SD over the saved predictions for all seeds. These values are computed directly from `results/predictions_seed*.csv`.
 
-`HistGradientBoostingClassifier` uses sklearn's **internal validation split for early stopping** (`validation_fraction=0.2`); it does not use the project's validation set for stopping. Model selection and threshold choice still use the project's validation set. The selected boosting iterations are saved as `early_stopping_trees` metric rows in `results/metrics.csv`:
+| RF good class | TP | FP | FN | TN | Precision | Recall |
+| --- | --- | --- | --- | --- | --- | --- |
+| Seed 0 | 162 | 228 | 40 | 634 | 0.415 | 0.802 |
+| Mean ± SD, all seeds | 165.8 ± 6.4 | 220.4 ± 36.3 | 36.2 ± 6.4 | 641.6 ± 36.3 | 0.432 ± 0.031 | 0.821 ± 0.032 |
 
-| Seed | 0 | 1 | 2 | 3 | 4 |
-|---|---:|---:|---:|---:|---:|
-| GB iterations | 235 | 44 | 38 | 138 | 90 |
+Precision is the share of predicted-good wines that are truly good; recall is the share of all truly good wines found. At the selected threshold, seed-0 precision is 0.415 and recall is 0.802; across seeds they are 0.432 ± 0.031 and 0.821 ± 0.032. The chosen threshold balances class recall rather than optimizing either precision or recall alone.
 
-## Additional analysis
+Key figures: [seed-0 ROC curves](./results/figures/roc_curves_seed0.png) and [seed-0 precision-recall curves](./results/figures/pr_curves_seed0.png) overlay all models. Validation-threshold seed-0 confusion matrices are generated for logistic regression, RF, and GB; no trivial-prior confusion figure is retained. [Feature importance](./results/figures/feature_importance.png) is shown with separate scales. The concise report contains only selected figures.
 
-All the following diagnostic curves use seed 0 unless noted. `scripts/run_analysis.py` regenerates them from the real fitted runs and held-out data.
+### Domain shift
 
-### EDA and figures
+For each direction, seed, and model, fitting and selection use source-color rows only. The threshold is chosen on source validation and held fixed. The first table preserves the original 20%-test-slice transfer evaluation; the second extends the same source-only fits to **every cleaned wine in the target color**. Neither target set is used to train, tune, or select the threshold. Cells in the first table show balanced accuracy at that threshold / ROC-AUC / PR-AUC (mean ± SD across seeds).
 
-- `eda_correlation_heatmap.png`: annotated correlation values with readable feature labels.
-- `eda_wine_type.png` and `eda_quality_by_type.png`: wine-type plots label `is_red=1` as Red and `is_red=0` as White.
-- `eda_density_by_class.png`: density distributions for `quality < 7` and `quality >= 7`.
-- `roc_curves_seed0.png` and `pr_curves_seed0.png`: all four models overlaid on the seed-0 test set.
-- `confusion_matrix_<model>_seed0.png`: one test confusion matrix per model, using its seed-0 validation-chosen threshold.
+#### Original target test-slice evaluation
 
-Per-seed ROC, PR, and confusion-matrix figures (including the old most-frequent baseline figures) are removed.
+| Model and direction | Mixed-domain test<br>BA / ROC-AUC / PR-AUC | Source-only source test<br>BA / ROC-AUC / PR-AUC | Source-only target 20% test slice<br>BA / ROC-AUC / PR-AUC | Target-slice PR-AUC lift | Target good rate | Positives / rows |
+| --- | --- | --- | --- | --- | --- | --- |
+| Random forest, red → white | 0.783 ± 0.011 / 0.847 ± 0.009 / 0.565 ± 0.018 | 0.771 ± 0.019 / 0.845 ± 0.023 / 0.528 ± 0.069 | 0.660 ± 0.052 / 0.737 ± 0.050 / 0.404 ± 0.054 | 1.940 ± 0.258 | 0.208 | 165 / 792 |
+| Random forest, white → red | 0.783 ± 0.011 / 0.847 ± 0.009 / 0.565 ± 0.018 | 0.774 ± 0.014 / 0.844 ± 0.010 / 0.572 ± 0.026 | 0.533 ± 0.031 / 0.713 ± 0.045 / 0.289 ± 0.044 | 2.121 ± 0.326 | 0.136 | 37 / 272 |
+| Gradient boosting, red → white | 0.764 ± 0.009 / 0.836 ± 0.006 / 0.531 ± 0.024 | 0.754 ± 0.018 / 0.834 ± 0.022 / 0.498 ± 0.084 | 0.664 ± 0.026 / 0.737 ± 0.006 / 0.377 ± 0.016 | 1.807 ± 0.076 | 0.208 | 165 / 792 |
+| Gradient boosting, white → red | 0.764 ± 0.009 / 0.836 ± 0.006 / 0.531 ± 0.024 | 0.758 ± 0.010 / 0.832 ± 0.005 / 0.545 ± 0.020 | 0.524 ± 0.012 / 0.687 ± 0.060 / 0.287 ± 0.045 | 2.110 ± 0.331 | 0.136 | 37 / 272 |
 
-### Feature importance and curves
+#### Entire cleaned target-domain evaluation
 
-Permutation importance is computed on the seed-0 test set with **10 repeats**, scored by average precision. The RF impurity importance is also shown in `feature_importance.png` (`results/permutation_importance.csv` contains the values). Permutation importance (change in test average precision) and impurity importance (normalized training split criterion) are different scales; compare rankings within each method, not the bar magnitudes across methods. Alcohol is the highest permutation-importance feature for both RF (0.188) and GB (0.230); RF next ranks chlorides (0.049) and total sulfur dioxide (0.047), while GB next ranks chlorides (0.036) and free sulfur dioxide (0.034).
+| Source-only model and direction | BA at fixed threshold | ROC-AUC | PR-AUC | PR-AUC / target rate (lift) | Target good rate | Positives / all target rows |
+| --- | --- | --- | --- | --- | --- | --- |
+| Random forest, red → white | 0.661 ± 0.048 | 0.738 ± 0.046 | 0.394 ± 0.051 | 1.889 ± 0.245 | 0.208 | 825 / 3961 |
+| Random forest, white → red | 0.533 ± 0.015 | 0.770 ± 0.022 | 0.315 ± 0.026 | 2.324 ± 0.188 | 0.135 | 184 / 1359 |
+| Gradient boosting, red → white | 0.658 ± 0.019 | 0.734 ± 0.010 | 0.380 ± 0.018 | 1.823 ± 0.085 | 0.208 | 825 / 3961 |
+| Gradient boosting, white → red | 0.532 ± 0.010 | 0.746 ± 0.038 | 0.307 ± 0.022 | 2.265 ± 0.161 | 0.135 | 184 / 1359 |
 
-`learning_curve.png` plots validation PR-AUC against training-set size:
+For red → white, the mixed-domain in-domain ROC-AUC minus full-white transfer ROC-AUC is 0.109 for RF and 0.101 for GB. Full-target ROC-AUC means are 0.738 ± 0.046 (RF) and 0.734 ± 0.010 (GB); their mean gap is 0.004 and their one-SD ranges overlap, so the five seeds do not support claiming RF transfers better. For white → red, fixed-threshold BA is 0.533 (RF) and 0.532 (GB), near chance, while ROC-AUC is 0.770 and 0.746; the ranking retains some signal but the source threshold fails to transfer. Use PR-AUC lift over the target good-wine rate for cross-domain precision-recall comparisons, since the base rates differ.
 
-| Training rows | 638 | 1,276 | 1,915 | 2,553 | 3,192 |
-|---|---:|---:|---:|---:|---:|
-| RF validation PR-AUC | 0.494 | 0.511 | 0.523 | 0.545 | 0.541 |
-| GB validation PR-AUC | 0.501 | 0.521 | 0.522 | 0.524 | 0.556 |
+The largest red/white distribution shifts in the cleaned data are total sulfur dioxide (red − white standardized mean difference -2.34), volatile acidity (red − white standardized mean difference +1.67), free sulfur dioxide (red − white standardized mean difference -1.33). The largest RF–GB permutation-importance gaps include alcohol, total sulfur dioxide, density. These are descriptive leads for hypotheses about transfer, not evidence that a specific feature shift causes the performance change.
 
-`gb_learning_rate_curve.png` varies the GB learning rate and reports validation PR-AUC. Rates 0.01, 0.03, 0.05, 0.10, and 0.20 scored 0.547, 0.556, 0.554, 0.550, and 0.550, respectively. Early-stopping iterations for these diagnostic fits are in `results/gb_learning_rate_curve.csv`.
+## 6. Error analysis
 
-### Error analysis
+The metadata alignment bug was caused by applying split indices from the cleaned/reset-index dataframe to raw-row metadata. Prediction metadata is now checked against the cleaned row, and every saved row asserts `actual_good == (quality >= 7)`. The error table is regenerated from saved seed-0 RF predictions and the cleaned data.
 
-The original error table joined test predictions to raw-row metadata using indices from the deduplicated/reset-index data, so sample metadata could refer to a different wine. This is fixed by joining through the cleaned dataset's `sample_index`; assertions now verify for every prediction that `actual_good == (quality >= 7)` and that the wine type matches the cleaned row.
+Seed-0 RF errors by quality:
 
-For the seed-0 RF at its validation-selected threshold (0.190), 268 of 1,064 test wines were misclassified (25.2%). Errors by quality are:
-
-| Quality | Test rows | Errors | Error rate | False positives | False negatives |
-|---:|---:|---:|---:|---:|---:|
+| Quality | Test rows | Errors | Error rate | FP | FN |
+| --- | --- | --- | --- | --- | --- |
 | 3 | 6 | 0 | 0.0% | 0 | 0 |
 | 4 | 35 | 9 | 25.7% | 9 | 0 |
 | 5 | 368 | 35 | 9.5% | 35 | 0 |
@@ -80,44 +107,50 @@ For the seed-0 RF at its validation-selected threshold (0.190), 268 of 1,064 tes
 | 7 | 171 | 38 | 22.2% | 0 | 38 |
 | 8 | 31 | 2 | 6.5% | 0 | 2 |
 
-Red wines had 58 errors among 272 (21.3%; 43 false positives, 15 false negatives); white wines had 210 errors among 792 (26.5%; 185 false positives, 25 false negatives). `results/misclassified_wines.csv` contains one table with five confident false positives followed by five confident false negatives, ranked by distance from threshold within each error group. The records contain the matching cleaned row's quality and all 11 feature values; the report displays them in one wide table.
+Quality 6 or 7 accounts for 222 of 268 errors (82.8%); other qualities account for 46. Red wines have 58/272 errors (21.3%); white wines have 210/792 (26.5%).
 
-### Red/white domain shift
+`results/misclassified_wines.csv` contains five confident false positives and five confident false negatives, each group sorted by distance from the threshold. In these ten examples, false positives have mean alcohol 12.63 and false negatives 9.46. The false positives are higher-alcohol and false negatives lower-alcohol on average, consistent with alcohol being a dominant RF signal (its permutation importance rank is 1); this is a pattern from ten selected examples, not evidence of causality or a population-wide effect.
 
-For each direction and seed, RF and GB configurations are selected by PR-AUC using only source-domain train/validation rows (eight configurations); the decision threshold is then selected on source validation and held fixed for source-test and target-test scoring. The target test results are compared with the same-seed mixed-domain test results. Metrics are mean ± standard deviation across seeds 0–4; triplets are `balanced accuracy at source-validation threshold / ROC-AUC / PR-AUC`.
+## 7. Limitations and ethics
 
-| Model and transfer | Mixed-domain in-domain test | Source-only source test | Source-only target test | Target good-wine prevalence | Target positives (of n) |
-|---|---:|---:|---:|---:|---:|
-| RF, red → white | 0.783 ± 0.011 / 0.847 ± 0.009 / 0.565 ± 0.018 | 0.771 ± 0.019 / 0.845 ± 0.023 / 0.528 ± 0.069 | 0.660 ± 0.052 / 0.737 ± 0.050 / 0.404 ± 0.054 | 0.208 ± 0.000 | 165 (n=792) |
-| GB, red → white | 0.764 ± 0.009 / 0.836 ± 0.006 / 0.531 ± 0.024 | 0.754 ± 0.018 / 0.834 ± 0.022 / 0.498 ± 0.084 | 0.664 ± 0.026 / 0.737 ± 0.006 / 0.377 ± 0.016 | 0.208 ± 0.000 | 165 (n=792) |
-| RF, white → red | 0.783 ± 0.011 / 0.847 ± 0.009 / 0.565 ± 0.018 | 0.774 ± 0.014 / 0.844 ± 0.010 / 0.572 ± 0.026 | 0.533 ± 0.031 / 0.713 ± 0.045 / 0.289 ± 0.044 | 0.136 ± 0.000 | 37 (n=272) |
-| GB, white → red | 0.764 ± 0.009 / 0.836 ± 0.006 / 0.531 ± 0.024 | 0.758 ± 0.010 / 0.832 ± 0.005 / 0.545 ± 0.020 | 0.524 ± 0.012 / 0.687 ± 0.060 / 0.287 ± 0.045 | 0.136 ± 0.000 | 37 (n=272) |
+- Exact duplicate rows were removed before splitting; this changes the sample mix and does not eliminate all near-duplicate or source-level dependence.
+- Sensory quality labels are subjective and noisy; the task is binary after thresholding an ordinal 0–10 score.
+- This is one Vinho Verde dataset, not evidence of performance on other regions, vintages, producers, or populations.
+- The red target test slice in the original transfer experiment contains only 37 positives; full-domain evaluation improves coverage but still uses one dataset.
+- The 5 seeds reuse overlapping samples, so seed-to-seed standard deviations understate sampling uncertainty.
+- Tuning grids are small; GB stopping is based on sklearn's internal split and varies between 38 and 235 trees.
+- `is_red` is not a model input. The experiment is for education and must not be used to price, certify, recommend, or make decisions about wines or people.
 
-The target-set class counts are stable across the stratified test seeds: each white target test set contains 165 good wines among 792 (20.8%); each red target test set contains 37 among 272 (13.6%). The source-only models select and hold their thresholds separately per seed. The largest red/white standardized mean differences are total sulfur dioxide (-2.34), volatile acidity (+1.67), free sulfur dioxide (-1.33), and density (+1.20), based on the deduplicated full dataset. RF and GB permutation importance differs most for alcohol, total sulfur dioxide, and density. Per-seed metrics, thresholds, selected configurations, good-wine rates, and positive counts are saved in `results/domain_shift_metrics.csv`; full feature distribution and importance comparisons are in `results/domain_feature_comparison.csv`.
+## 8. Reproduce
 
-## Reproduce results
-
-From the project root:
+From a fresh clone, use the following commands. `run_all.sh` creates a virtual environment and installs the pinned requirements if `.venv` is absent; the explicit install command is shown for clarity.
 
 ```bash
+git clone <repository-url> ec417-miniproject-P07-623185
+cd ec417-miniproject-P07-623185
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 ./run_all.sh
 ```
 
-The script downloads the source files, runs all five seed-specific model comparisons, regenerates the analysis CSVs and figures, then produces `report/report.pdf`. The PDF is six pages and contains only the overview, key figures, domain comparison, and concise error-analysis examples.
+The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took not recorded yet for a clean-clone install-and-run. Hardware/software: See the measured fresh-clone run recorded in results/reproducibility.json.
 
-## Key files
+Useful outputs: `results/metrics.csv`, `results/predictions_seed*.csv`, `results/domain_shift_metrics.csv`, `results/error_analysis.json`, and `results/figures/`. To check the report/demo materials, see [demo outline](./report/demo_outline.md) and [viva questions](./docs/viva_questions.md).
 
-- `src/data.py`: data loading, duplicate accounting, and split creation
-- `src/train.py`: model tuning, test evaluation, per-seed metrics and predictions
-- `scripts/run_analysis.py`: EDA, importance, learning/validation curves, domain shift, and error analysis
-- `scripts/make_report.py`: six-page PDF report generation
-- `results/metrics.csv`: per-seed test metrics, including GB early-stopping iterations
-- `results/domain_shift_metrics.csv`: source/target transfer results and mixed-domain comparisons
-- `results/permutation_importance.csv`, `results/learning_curve.csv`, `results/gb_learning_rate_curve.csv`: numerical diagnostic outputs
-- `results/error_analysis.json`, `results/misclassified_wines.csv`: error-by-quality and wine-type summaries, plus five false positives and five false negatives
-- `results/figures/`: regenerated EDA and model-analysis figures
-- `report/report.pdf`: concise report with key figures only
+## 9. AI-use statement
 
-## Data source
+OpenAI Codex generated the code scaffold, experiments, and draft text. Claude was used to review results and provide advice.
 
-P. Cortez, A. Cerdeira, F. Almeida, T. Matos, and J. Reis. “Modeling wine preferences by data mining from physicochemical properties.” *Decision Support Systems*, 47(4):547–553, 2009. Dataset: [UCI Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality).
+> **TODO — personal verification (the author must complete this):**
+> - [ ] State which outputs, calculations, and claims I personally checked, and how.
+> - [ ] State what I changed after reviewing the AI-generated code and drafts.
+> - [ ] Confirm that the final report and viva answers reflect my own understanding.
+
+No personal verification is claimed here.
+
+## 10. References
+
+1. P. Cortez, A. Cerdeira, F. Almeida, T. Matos, and J. Reis. “Modeling wine preferences by data mining from physicochemical properties.” *Decision Support Systems* 47(4), 547–553 (2009). [DOI: 10.1016/j.dss.2009.05.016](https://doi.org/10.1016/j.dss.2009.05.016); [UCI dataset](https://doi.org/10.24432/C56S3T).
+2. L. Breiman. “Random Forests.” *Machine Learning* 45, 5–32 (2001). [DOI: 10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324).
+3. J. H. Friedman. “Greedy Function Approximation: A Gradient Boosting Machine.” *The Annals of Statistics* 29(5), 1189–1232 (2001). [DOI: 10.1214/aos/1013203451](https://doi.org/10.1214/aos/1013203451).
+4. scikit-learn documentation used for [`RandomForestClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html), [`HistGradientBoostingClassifier` early stopping](https://scikit-learn.org/stable/modules/ensemble.html#histogram-based-gradient-boosting), [permutation importance](https://scikit-learn.org/stable/modules/permutation_importance.html), and [average precision](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html).

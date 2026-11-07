@@ -12,4 +12,5 @@ fi
 "$ROOT/.venv/bin/python" scripts/get_data.py
 "$ROOT/.venv/bin/python" -m src.train
 "$ROOT/.venv/bin/python" scripts/run_analysis.py
+"$ROOT/.venv/bin/python" scripts/write_readme.py
 "$ROOT/.venv/bin/python" scripts/make_report.py
