@@ -16,7 +16,7 @@
    *Speaker note:* Be honest about the result on each seed and describe possible explanations only as hypotheses.
 
 6. **Ranking and operating point** — Show the seed-zero ROC and precision-recall overlays, then explain the selected threshold.  
-   *Speaker note:* Contrast ranking quality with a fixed 0.5 decision point and report the precision/recall trade-off.
+   *Speaker note:* BA at 0.5 uses the same fixed cutoff across models; the class-weighted RF has BA 0.638 there and 0.783 at its validation-selected threshold (seed-zero cutoff 0.19). Scores were not calibrated here; a reliability diagram could assess calibration, and no cause is claimed.
 
 7. **Feature behavior and diagnostics** — Show permutation versus impurity importance and the learning/GB validation curves.  
    *Speaker note:* Point out that the two importance methods are different scales and early stopping uses sklearn's internal split.

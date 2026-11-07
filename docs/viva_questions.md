@@ -32,7 +32,7 @@ Balanced accuracy averages sensitivity and specificity, so each class contribute
 
 ## 7. Why is balanced accuracy at 0.5 not the whole story?
 
-It describes one arbitrary cutoff, not ranking quality or the best validation operating point. The saved RF results show why both fixed-0.5 and validation-threshold BA are reported; the RF uses `class_weight="balanced_subsample"`, so it should not be described as unweighted.  
+Balanced accuracy at 0.5 applies the same fixed probability cutoff to LR, RF, and GB; their mean values are 0.759, 0.638, and 0.761. At the separate validation-chosen thresholds, mean BA is 0.756, 0.783, and 0.764. The RF is class-weighted (`class_weight="balanced_subsample"`); its seed-0 threshold is 0.19, and its scores were not calibrated to a 0.5 cutoff in this project. Calibration was not tested, so do not claim a cause for the difference; a reliability diagram could assess calibration.  
 **Where:** [`src/models.py`](../src/models.py) — `make_random_forest_model()`; [`results/metrics.csv`](../results/metrics.csv).
 
 ## 8. Why did the random forest beat gradient boosting on PR-AUC?

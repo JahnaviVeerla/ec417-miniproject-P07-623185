@@ -66,6 +66,15 @@ def main() -> None:
     domain_features = pd.read_csv(RESULTS / "domain_feature_comparison.csv")
     importance = pd.read_csv(RESULTS / "permutation_importance.csv")
     examples = pd.read_csv(RESULTS / "misclassified_wines.csv")
+    ba_means = {
+        model: {
+            metric: float(metrics[
+                (metrics["model"] == model) & (metrics["metric"] == metric)
+            ]["value"].mean())
+            for metric in ("balanced_accuracy_0.5", "balanced_accuracy_val_threshold")
+        }
+        for model in ("logistic_regression", "random_forest", "gradient_boosting")
+    }
     rf_importance = importance[importance["model"] == "random_forest"].sort_values(
         "permutation_importance_mean", ascending=False
     )
@@ -123,9 +132,13 @@ def main() -> None:
             "this tests how lab measures proxy subjective sensory judgments. "
             f"Only {dataset['good_wine_rate_after']:.1%} of cleaned rows are positive, so PR-AUC "
             "(average precision) is primary: it foregrounds positive-class retrieval and reflects the "
-            "low base rate. Balanced accuracy is also reported, but its value at a fixed 0.5 cutoff "
-            "depends on that operating point. The RF uses balanced_subsample class weights, so it is "
-            "not an unweighted forest; its 0.5 cutoff is not assumed to be calibrated.",
+            "low base rate. Balanced accuracy averages sensitivity and specificity at a particular "
+            "threshold. The BA @ 0.5 column applies the same fixed cutoff to every model; its mean values "
+            f"are LR {ba_means['logistic_regression']['balanced_accuracy_0.5']:.3f}, "
+            f"RF {ba_means['random_forest']['balanced_accuracy_0.5']:.3f}, and "
+            f"GB {ba_means['gradient_boosting']['balanced_accuracy_0.5']:.3f}. "
+            "The validation-threshold BA uses each model's validation-selected cutoff; these are distinct "
+            "operating points, not ranking scores.",
             width=105,
         )
         fig.text(
@@ -199,11 +212,21 @@ def main() -> None:
         ].sort_values("seed")
         fig.text(
             .07, .12,
-            "RF exceeded GB in PR-AUC on every paired seed. "
-            f"Paired RF−GB differences: {', '.join(f'{value:+.3f}' for value in paired)}. "
-            f"GB early stopping uses sklearn's internal validation split; iterations by seed: "
-            f"{', '.join(str(int(value)) for value in early['value'])}.",
-            fontsize=8.5, wrap=True,
+            textwrap.fill(
+                "Validation-threshold BA means are "
+                f"LR {ba_means['logistic_regression']['balanced_accuracy_val_threshold']:.3f}, "
+                f"RF {ba_means['random_forest']['balanced_accuracy_val_threshold']:.3f}, and "
+                f"GB {ba_means['gradient_boosting']['balanced_accuracy_val_threshold']:.3f}. "
+                f"The seed-0 RF validation threshold is {error['threshold']:.2f}. The RF uses "
+                "balanced_subsample class weights; its probabilities were not calibrated to a 0.5 cutoff "
+                "here, and calibration was not tested. A reliability diagram could assess calibration; "
+                "no cause for the threshold difference is claimed. RF exceeded GB in PR-AUC on every paired "
+                f"seed (RF−GB: {', '.join(f'{value:+.3f}' for value in paired)}). GB early stopping uses "
+                "sklearn's internal validation split; iterations by seed: "
+                f"{', '.join(str(int(value)) for value in early['value'])}.",
+                width=125,
+            ),
+            fontsize=8, va="top",
         )
         fig.text(.07, .045, "See README.md for complete per-seed tables and secondary analyses.", fontsize=9)
         pdf.savefig(fig, bbox_inches="tight")
@@ -378,9 +401,16 @@ def main() -> None:
                 f"{reproducibility['cpu_count']} logical CPUs, {reproducibility['memory_gib']:.1f} GiB RAM; "
                 f"{reproducibility['platform']}; Python {reproducibility['python_version']}."
             )
+            python_311_test = reproducibility.get("python_311_requirements_install")
+            python_compatibility = (
+                f"Python {python_311_test['python_version']} requirements install "
+                f"{python_311_test['status']}: {python_311_test['reason']}. "
+                if python_311_test else ""
+            )
         else:
             runtime = "not recorded yet"
             hardware = "See results/reproducibility.json after the fresh-clone check."
+            python_compatibility = ""
         fig = plt.figure(figsize=(8.27, 11.69))
         fig.text(.07, .95, "Limitations, reproducibility, and next steps", fontsize=18, weight="bold", color="#17365d")
         limitations = [
@@ -407,7 +437,7 @@ def main() -> None:
             "and figures, writes README.md, and builds this report.",
             fontsize=9.2, wrap=True, va="top",
         )
-        fig.text(.085, .57, f"Fresh-clone total (clone, environment, install, run): {runtime}. Hardware/software: {hardware}",
+        fig.text(.085, .57, f"Fresh-clone total (clone, environment, install, run): {runtime}. Hardware/software: {hardware} {python_compatibility}",
                  fontsize=9.2, wrap=True, va="top")
         fig.text(.075, .48, "What I would try next", fontsize=12, weight="bold")
         next_steps = [
@@ -423,11 +453,13 @@ def main() -> None:
         fig.text(.075, .31, "AI use — author TODO", fontsize=12, weight="bold")
         fig.text(
             .085, .27,
-            "OpenAI Codex generated the code scaffold, experiments, and drafts; Claude was used for "
-            "reviewing results and advice.\n\n"
-            "TODO: The author must fill in what they personally verified, the evidence/method used, and "
-            "what was changed after reviewing AI output. No personal verification is claimed here.",
-            fontsize=9.2, wrap=True, va="top",
+            "The coding assistant was an AI assistant using Copilot SDK in VS Code. It helped create the "
+            "code scaffold, run experiments, generate the README and report, and fix errors. Claude "
+            "(Anthropic) reviewed results, spotted issues (including the index-alignment bug and weighted-RF "
+            "wording), and provided advice.\n\n"
+            "TODO (student): list what I personally verified, for example the leakage-free split, the "
+            "label/index alignment fix, the numbers in the results table, and the viva answers.",
+            fontsize=8.7, wrap=True, va="top",
         )
         fig.text(.075, .14, "References", fontsize=12, weight="bold")
         fig.text(
