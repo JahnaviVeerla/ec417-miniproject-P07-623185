@@ -1,0 +1,11 @@
+model,training_fraction,training_rows,validation_pr_auc,seed
+random_forest,0.2,638,0.49396908945712514,0
+random_forest,0.4,1276,0.5114236088339298,0
+random_forest,0.6,1915,0.5233878925119732,0
+random_forest,0.8,2553,0.5450856703345246,0
+random_forest,1.0,3192,0.541280067011985,0
+gradient_boosting,0.2,638,0.5006069700464147,0
+gradient_boosting,0.4,1276,0.5211282082566641,0
+gradient_boosting,0.6,1915,0.5221704844502073,0
+gradient_boosting,0.8,2553,0.5243342825454939,0
+gradient_boosting,1.0,3192,0.5560541810038022,0

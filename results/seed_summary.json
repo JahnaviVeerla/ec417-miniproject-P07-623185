@@ -1,0 +1,9 @@
+{
+  "seed": 0,
+  "rows_before": 6497,
+  "rows_involved_in_duplicates": 2169,
+  "redundant_rows_removed": 1177,
+  "rows_after": 5320,
+  "good_ratio_before": 0.19655225488687086,
+  "good_ratio_after": 0.18966165413533834
+}

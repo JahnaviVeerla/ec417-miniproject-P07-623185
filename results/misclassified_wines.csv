@@ -1,0 +1,11 @@
+error_type,sample_index,wine_type,quality,actual,prediction,probability,threshold,distance_from_threshold,fixed_acidity,volatile_acidity,citric_acid,residual_sugar,chlorides,free_sulfur_dioxide,total_sulfur_dioxide,density,pH,sulphates,alcohol
+False positive,3931,White,6,Not good,Good,0.8775,0.19,0.6875,6.6,0.25,0.35,2.9,0.034,38.0,121.0,0.99008,3.19,0.4,12.8
+False positive,5021,White,6,Not good,Good,0.845,0.19,0.655,5.7,0.28,0.3,3.9,0.026,36.0,105.0,0.98963,3.26,0.58,12.75
+False positive,5059,White,6,Not good,Good,0.82625,0.19,0.63625,5.8,0.42,0.3,2.2,0.035,26.0,129.0,0.989,3.32,0.47,12.9
+False positive,4861,White,6,Not good,Good,0.81375,0.19,0.62375,6.4,0.31,0.28,2.5,0.039,34.0,137.0,0.98946,3.22,0.38,12.7
+False positive,1041,Red,6,Not good,Good,0.7975,0.19,0.6074999999999999,10.5,0.36,0.47,2.2,0.074,9.0,23.0,0.99638,3.23,0.76,12.0
+False negative,58,Red,7,Good,Not good,0.0,0.19,0.19,7.5,0.52,0.16,1.9,0.085,12.0,35.0,0.9968,3.38,0.62,9.5
+False negative,3167,White,7,Good,Not good,0.0,0.19,0.19,6.0,0.34,0.24,5.4,0.06,23.0,126.0,0.9951,3.25,0.44,9.0
+False negative,7,Red,7,Good,Not good,0.01125,0.19,0.17875,7.8,0.58,0.02,2.0,0.073,9.0,18.0,0.9968,3.36,0.57,9.5
+False negative,1243,Red,7,Good,Not good,0.0125,0.19,0.1775,7.3,0.48,0.32,2.1,0.062,31.0,54.0,0.99728,3.3,0.65,10.0
+False negative,1687,White,7,Good,Not good,0.015,0.19,0.175,7.0,0.3,0.38,14.9,0.032,60.0,181.0,0.9983,3.18,0.61,9.3

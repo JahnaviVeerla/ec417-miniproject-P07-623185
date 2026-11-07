@@ -1,0 +1,180 @@
+{
+  "model": "random_forest",
+  "seed": 0,
+  "threshold": 0.19,
+  "test_rows": 1064,
+  "errors": 268,
+  "error_rate": 0.2518796992481203,
+  "error_counts_by_quality": {
+    "3": {
+      "test_rows": 6,
+      "errors": 0,
+      "error_rate": 0.0,
+      "false_positives": 0,
+      "false_negatives": 0
+    },
+    "4": {
+      "test_rows": 35,
+      "errors": 9,
+      "error_rate": 0.2571428571428571,
+      "false_positives": 9,
+      "false_negatives": 0
+    },
+    "5": {
+      "test_rows": 368,
+      "errors": 35,
+      "error_rate": 0.09510869565217392,
+      "false_positives": 35,
+      "false_negatives": 0
+    },
+    "6": {
+      "test_rows": 453,
+      "errors": 184,
+      "error_rate": 0.40618101545253865,
+      "false_positives": 184,
+      "false_negatives": 0
+    },
+    "7": {
+      "test_rows": 171,
+      "errors": 38,
+      "error_rate": 0.2222222222222222,
+      "false_positives": 0,
+      "false_negatives": 38
+    },
+    "8": {
+      "test_rows": 31,
+      "errors": 2,
+      "error_rate": 0.06451612903225806,
+      "false_positives": 0,
+      "false_negatives": 2
+    }
+  },
+  "error_rate_by_wine_type": {
+    "white": {
+      "errors": 210,
+      "false_positives": 185,
+      "false_negatives": 25,
+      "test_rows": 792,
+      "error_rate": 0.26515151515151514
+    },
+    "red": {
+      "errors": 58,
+      "false_positives": 43,
+      "false_negatives": 15,
+      "test_rows": 272,
+      "error_rate": 0.21323529411764705
+    }
+  },
+  "quality_6_or_7_errors": 222,
+  "other_quality_errors": 46,
+  "quality_6_or_7_share_of_errors": 0.8283582089552238,
+  "alcohol_by_confident_error_group": {
+    "false_positives": {
+      "count": 5,
+      "mean": 12.63
+    },
+    "false_negatives": {
+      "count": 5,
+      "mean": 9.459999999999999
+    }
+  },
+  "good_class_confusion_and_precision_recall": {
+    "seed_0": {
+      "seed": 0,
+      "threshold": 0.19,
+      "test_rows": 1064,
+      "tp": 162,
+      "fp": 228,
+      "fn": 40,
+      "tn": 634,
+      "precision_good": 0.4153846153846154,
+      "recall_good": 0.801980198019802
+    },
+    "all_seeds": {
+      "seed_count": 5,
+      "per_seed": [
+        {
+          "seed": 0,
+          "threshold": 0.19,
+          "test_rows": 1064,
+          "tp": 162,
+          "fp": 228,
+          "fn": 40,
+          "tn": 634,
+          "precision_good": 0.4153846153846154,
+          "recall_good": 0.801980198019802
+        },
+        {
+          "seed": 1,
+          "threshold": 0.23,
+          "test_rows": 1064,
+          "tp": 160,
+          "fp": 185,
+          "fn": 42,
+          "tn": 677,
+          "precision_good": 0.463768115942029,
+          "recall_good": 0.7920792079207921
+        },
+        {
+          "seed": 2,
+          "threshold": 0.21,
+          "test_rows": 1064,
+          "tp": 162,
+          "fp": 193,
+          "fn": 40,
+          "tn": 669,
+          "precision_good": 0.4563380281690141,
+          "recall_good": 0.801980198019802
+        },
+        {
+          "seed": 3,
+          "threshold": 0.16,
+          "test_rows": 1064,
+          "tp": 175,
+          "fp": 277,
+          "fn": 27,
+          "tn": 585,
+          "precision_good": 0.38716814159292035,
+          "recall_good": 0.8663366336633663
+        },
+        {
+          "seed": 4,
+          "threshold": 0.19,
+          "test_rows": 1064,
+          "tp": 170,
+          "fp": 219,
+          "fn": 32,
+          "tn": 643,
+          "precision_good": 0.4370179948586118,
+          "recall_good": 0.8415841584158416
+        }
+      ],
+      "mean_std": {
+        "tp": {
+          "mean": 165.8,
+          "std": 6.418722614352484
+        },
+        "fp": {
+          "mean": 220.4,
+          "std": 36.287738976133525
+        },
+        "fn": {
+          "mean": 36.2,
+          "std": 6.418722614352484
+        },
+        "tn": {
+          "mean": 641.6,
+          "std": 36.287738976133525
+        },
+        "precision_good": {
+          "mean": 0.43193537918943814,
+          "std": 0.031275704360440804
+        },
+        "recall_good": {
+          "mean": 0.8207920792079209,
+          "std": 0.03177585452649742
+        }
+      }
+    }
+  }
+}

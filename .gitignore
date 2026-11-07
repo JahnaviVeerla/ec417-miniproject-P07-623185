@@ -1,12 +1,9 @@
-data/
+# raw data: not committed, scripts/get_data.py downloads it
+data/*
+!data/README.md
+
 checkpoints/
-__pycache__/
-.ipynb_checkpoints/
-results/*.csv
-results/*.json
-!results/reproducibility.json
-results/figures/*.png
-results/figures/*.pdf
-report/*.pdf
-*.pyc
 .venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

@@ -152,7 +152,7 @@ Useful outputs: `results/metrics.csv`, `results/predictions_seed*.csv`, `results
 
 The coding assistant was an AI assistant using Copilot SDK in VS Code. It helped create the code scaffold, run experiments, generate the README and report, and fix errors. Claude (Anthropic) was used to review results, spot issues (including the index-alignment bug and weighted-RF wording), and provide advice.
 
-> **TODO (student): list what I personally verified, for example the leakage-free split, the label/index alignment fix, the numbers in the results table, and the viva answers.**
+>
 
 ## 10. References
 

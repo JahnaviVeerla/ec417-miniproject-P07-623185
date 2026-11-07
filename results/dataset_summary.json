@@ -1,0 +1,45 @@
+{
+  "rows_before": 6497,
+  "rows_involved_in_duplicates": 2169,
+  "redundant_rows_removed": 1177,
+  "rows_after": 5320,
+  "good_wine_rate_before": 0.19655225488687086,
+  "good_wine_rate_after": 0.18966165413533834,
+  "good_wines_after": 1009,
+  "wine_type_after": {
+    "white": {
+      "rows": 3961,
+      "good_wines": 825,
+      "good_wine_rate": 0.2082807371875789
+    },
+    "red": {
+      "rows": 1359,
+      "good_wines": 184,
+      "good_wine_rate": 0.13539367181751288
+    }
+  },
+  "split_rows_seed0": {
+    "train": 3192,
+    "val": 1064,
+    "test": 1064
+  },
+  "split_fractions_seed0": {
+    "train": 0.6,
+    "val": 0.2,
+    "test": 0.2
+  },
+  "features": [
+    "fixed_acidity",
+    "volatile_acidity",
+    "citric_acid",
+    "residual_sugar",
+    "chlorides",
+    "free_sulfur_dioxide",
+    "total_sulfur_dioxide",
+    "density",
+    "pH",
+    "sulphates",
+    "alcohol"
+  ],
+  "is_red_is_model_feature": false
+}

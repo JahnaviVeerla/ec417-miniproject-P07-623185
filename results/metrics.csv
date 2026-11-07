@@ -1,0 +1,106 @@
+model,seed,metric,value,notes
+trivial_prior,0,balanced_accuracy_0.5,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,0,balanced_accuracy_val_threshold,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,0,roc_auc,0.5,config_count=1; tuning_metric=prior
+trivial_prior,0,average_precision,0.18984962406015038,config_count=1; tuning_metric=prior
+trivial_prior,0,training_time_seconds,0.001,config_count=1; tuning_metric=prior
+logistic_regression,0,balanced_accuracy_0.5,0.7523029565137489,threshold=0.520; val_bal_acc=0.7586; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,0,balanced_accuracy_val_threshold,0.7480473685419586,threshold=0.520; val_bal_acc=0.7586; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,0,roc_auc,0.8082228756518343,threshold=0.520; val_bal_acc=0.7586; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,0,average_precision,0.5179286916425807,threshold=0.520; val_bal_acc=0.7586; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,0,training_time_seconds,0.014967966824769974,threshold=0.520; val_bal_acc=0.7586; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+random_forest,0,balanced_accuracy_0.5,0.651650547885415,threshold=0.190; val_bal_acc=0.7724; config_count=8; tuning_metric=PR-AUC; train_time_s=2.804; class_weight=balanced_subsample; 
+random_forest,0,balanced_accuracy_val_threshold,0.7687395189634973,threshold=0.190; val_bal_acc=0.7724; config_count=8; tuning_metric=PR-AUC; train_time_s=2.804; class_weight=balanced_subsample; 
+random_forest,0,roc_auc,0.8361857067377271,threshold=0.190; val_bal_acc=0.7724; config_count=8; tuning_metric=PR-AUC; train_time_s=2.804; class_weight=balanced_subsample; 
+random_forest,0,average_precision,0.5582265198616361,threshold=0.190; val_bal_acc=0.7724; config_count=8; tuning_metric=PR-AUC; train_time_s=2.804; class_weight=balanced_subsample; 
+random_forest,0,training_time_seconds,2.803594410419464,threshold=0.190; val_bal_acc=0.7724; config_count=8; tuning_metric=PR-AUC; train_time_s=2.804; class_weight=balanced_subsample; 
+gradient_boosting,0,balanced_accuracy_0.5,0.7521478946038456,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,0,balanced_accuracy_val_threshold,0.7513323838184283,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,0,roc_auc,0.8258654751786084,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,0,average_precision,0.5368322012344927,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,0,training_time_seconds,0.656374130398035,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,0,early_stopping_trees,235.0,threshold=0.560; val_bal_acc=0.7649; config_count=8; tuning_metric=PR-AUC; train_time_s=0.656; early_stopping_trees=235; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+trivial_prior,1,balanced_accuracy_0.5,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,1,balanced_accuracy_val_threshold,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,1,roc_auc,0.5,config_count=1; tuning_metric=prior
+trivial_prior,1,average_precision,0.18984962406015038,config_count=1; tuning_metric=prior
+trivial_prior,1,training_time_seconds,0.001,config_count=1; tuning_metric=prior
+logistic_regression,1,balanced_accuracy_0.5,0.779955663779835,threshold=0.530; val_bal_acc=0.7573; config_count=8; tuning_metric=PR-AUC; train_time_s=0.014; class_weight=balanced; 
+logistic_regression,1,balanced_accuracy_val_threshold,0.7657990857090349,threshold=0.530; val_bal_acc=0.7573; config_count=8; tuning_metric=PR-AUC; train_time_s=0.014; class_weight=balanced; 
+logistic_regression,1,roc_auc,0.8268647630424294,threshold=0.530; val_bal_acc=0.7573; config_count=8; tuning_metric=PR-AUC; train_time_s=0.014; class_weight=balanced; 
+logistic_regression,1,average_precision,0.473448301031185,threshold=0.530; val_bal_acc=0.7573; config_count=8; tuning_metric=PR-AUC; train_time_s=0.014; class_weight=balanced; 
+logistic_regression,1,training_time_seconds,0.014399662613868713,threshold=0.530; val_bal_acc=0.7573; config_count=8; tuning_metric=PR-AUC; train_time_s=0.014; class_weight=balanced; 
+random_forest,1,balanced_accuracy_0.5,0.6477452849693321,threshold=0.230; val_bal_acc=0.7874; config_count=8; tuning_metric=PR-AUC; train_time_s=3.036; class_weight=balanced_subsample; 
+random_forest,1,balanced_accuracy_val_threshold,0.7887310192736211,threshold=0.230; val_bal_acc=0.7874; config_count=8; tuning_metric=PR-AUC; train_time_s=3.036; class_weight=balanced_subsample; 
+random_forest,1,roc_auc,0.8565993200248099,threshold=0.230; val_bal_acc=0.7874; config_count=8; tuning_metric=PR-AUC; train_time_s=3.036; class_weight=balanced_subsample; 
+random_forest,1,average_precision,0.5554595850916753,threshold=0.230; val_bal_acc=0.7874; config_count=8; tuning_metric=PR-AUC; train_time_s=3.036; class_weight=balanced_subsample; 
+random_forest,1,training_time_seconds,3.036116937175393,threshold=0.230; val_bal_acc=0.7874; config_count=8; tuning_metric=PR-AUC; train_time_s=3.036; class_weight=balanced_subsample; 
+gradient_boosting,1,balanced_accuracy_0.5,0.7749247662585284,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,1,balanced_accuracy_val_threshold,0.7650295191932186,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,1,roc_auc,0.8375324481404058,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,1,average_precision,0.5179651222298494,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,1,training_time_seconds,0.24747562408447266,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,1,early_stopping_trees,44.0,threshold=0.360; val_bal_acc=0.7690; config_count=8; tuning_metric=PR-AUC; train_time_s=0.247; early_stopping_trees=44; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+trivial_prior,2,balanced_accuracy_0.5,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,2,balanced_accuracy_val_threshold,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,2,roc_auc,0.5,config_count=1; tuning_metric=prior
+trivial_prior,2,average_precision,0.18984962406015038,config_count=1; tuning_metric=prior
+trivial_prior,2,training_time_seconds,0.001,config_count=1; tuning_metric=prior
+logistic_regression,2,balanced_accuracy_0.5,0.7451471365233971,threshold=0.430; val_bal_acc=0.7505; config_count=8; tuning_metric=PR-AUC; train_time_s=0.016; class_weight=balanced; 
+logistic_regression,2,balanced_accuracy_val_threshold,0.7427924927063472,threshold=0.430; val_bal_acc=0.7505; config_count=8; tuning_metric=PR-AUC; train_time_s=0.016; class_weight=balanced; 
+logistic_regression,2,roc_auc,0.8087569777859457,threshold=0.430; val_bal_acc=0.7505; config_count=8; tuning_metric=PR-AUC; train_time_s=0.016; class_weight=balanced; 
+logistic_regression,2,average_precision,0.49288982174475937,threshold=0.430; val_bal_acc=0.7505; config_count=8; tuning_metric=PR-AUC; train_time_s=0.016; class_weight=balanced; 
+logistic_regression,2,training_time_seconds,0.015758652240037918,threshold=0.430; val_bal_acc=0.7505; config_count=8; tuning_metric=PR-AUC; train_time_s=0.016; class_weight=balanced; 
+random_forest,2,balanced_accuracy_0.5,0.6180423146723025,threshold=0.210; val_bal_acc=0.7640; config_count=8; tuning_metric=PR-AUC; train_time_s=2.798; class_weight=balanced_subsample; 
+random_forest,2,balanced_accuracy_val_threshold,0.7890411430934277,threshold=0.210; val_bal_acc=0.7640; config_count=8; tuning_metric=PR-AUC; train_time_s=2.798; class_weight=balanced_subsample; 
+random_forest,2,roc_auc,0.8426523626840643,threshold=0.210; val_bal_acc=0.7640; config_count=8; tuning_metric=PR-AUC; train_time_s=2.798; class_weight=balanced_subsample; 
+random_forest,2,average_precision,0.550057919731733,threshold=0.210; val_bal_acc=0.7640; config_count=8; tuning_metric=PR-AUC; train_time_s=2.798; class_weight=balanced_subsample; 
+random_forest,2,training_time_seconds,2.7983182352036238,threshold=0.210; val_bal_acc=0.7640; config_count=8; tuning_metric=PR-AUC; train_time_s=2.798; class_weight=balanced_subsample; 
+gradient_boosting,2,balanced_accuracy_0.5,0.7510969194367233,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,2,balanced_accuracy_val_threshold,0.7703647975006317,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,2,roc_auc,0.8373687716799522,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,2,average_precision,0.5001652286823994,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,2,training_time_seconds,0.44416878931224346,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,2,early_stopping_trees,38.0,threshold=0.320; val_bal_acc=0.7701; config_count=8; tuning_metric=PR-AUC; train_time_s=0.444; early_stopping_trees=38; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+trivial_prior,3,balanced_accuracy_0.5,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,3,balanced_accuracy_val_threshold,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,3,roc_auc,0.5,config_count=1; tuning_metric=prior
+trivial_prior,3,average_precision,0.18984962406015038,config_count=1; tuning_metric=prior
+trivial_prior,3,training_time_seconds,0.001,config_count=1; tuning_metric=prior
+logistic_regression,3,balanced_accuracy_0.5,0.7540832969607866,threshold=0.490; val_bal_acc=0.7772; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,3,balanced_accuracy_val_threshold,0.7606590705474259,threshold=0.490; val_bal_acc=0.7772; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,3,roc_auc,0.8204612804667938,threshold=0.490; val_bal_acc=0.7772; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,3,average_precision,0.5011598282218016,threshold=0.490; val_bal_acc=0.7772; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+logistic_regression,3,training_time_seconds,0.01542784832417965,threshold=0.490; val_bal_acc=0.7772; config_count=8; tuning_metric=PR-AUC; train_time_s=0.015; class_weight=balanced; 
+random_forest,3,balanced_accuracy_0.5,0.629528382072546,threshold=0.160; val_bal_acc=0.7908; config_count=8; tuning_metric=PR-AUC; train_time_s=2.735; class_weight=balanced_subsample; 
+random_forest,3,balanced_accuracy_val_threshold,0.7724954630033769,threshold=0.160; val_bal_acc=0.7908; config_count=8; tuning_metric=PR-AUC; train_time_s=2.735; class_weight=balanced_subsample; 
+random_forest,3,roc_auc,0.8467873469481519,threshold=0.160; val_bal_acc=0.7908; config_count=8; tuning_metric=PR-AUC; train_time_s=2.735; class_weight=balanced_subsample; 
+random_forest,3,average_precision,0.5674638821228526,threshold=0.160; val_bal_acc=0.7908; config_count=8; tuning_metric=PR-AUC; train_time_s=2.735; class_weight=balanced_subsample; 
+random_forest,3,training_time_seconds,2.7345546651631594,threshold=0.160; val_bal_acc=0.7908; config_count=8; tuning_metric=PR-AUC; train_time_s=2.735; class_weight=balanced_subsample; 
+gradient_boosting,3,balanced_accuracy_0.5,0.7566734051595415,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,3,balanced_accuracy_val_threshold,0.7589591325721899,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,3,roc_auc,0.8377018676345592,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,3,average_precision,0.5335454608679787,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,3,training_time_seconds,0.5331769678741693,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,3,early_stopping_trees,138.0,threshold=0.430; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.533; early_stopping_trees=138; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+trivial_prior,4,balanced_accuracy_0.5,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,4,balanced_accuracy_val_threshold,0.5,threshold=0.000; val_bal_acc=0.5000; config_count=1; tuning_metric=prior
+trivial_prior,4,roc_auc,0.5,config_count=1; tuning_metric=prior
+trivial_prior,4,average_precision,0.18984962406015038,config_count=1; tuning_metric=prior
+trivial_prior,4,training_time_seconds,0.001,config_count=1; tuning_metric=prior
+logistic_regression,4,balanced_accuracy_0.5,0.7625542716684661,threshold=0.480; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.013; class_weight=balanced; 
+logistic_regression,4,balanced_accuracy_val_threshold,0.7644896740254072,threshold=0.480; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.013; class_weight=balanced; 
+logistic_regression,4,roc_auc,0.8182214973237463,threshold=0.480; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.013; class_weight=balanced; 
+logistic_regression,4,average_precision,0.509132127278512,threshold=0.480; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.013; class_weight=balanced; 
+logistic_regression,4,training_time_seconds,0.013122174888849258,threshold=0.480; val_bal_acc=0.7786; config_count=8; tuning_metric=PR-AUC; train_time_s=0.013; class_weight=balanced; 
+random_forest,4,balanced_accuracy_0.5,0.6436447589074453,threshold=0.190; val_bal_acc=0.7969; config_count=8; tuning_metric=PR-AUC; train_time_s=3.074; class_weight=balanced_subsample; 
+random_forest,4,balanced_accuracy_val_threshold,0.7937619167949277,threshold=0.190; val_bal_acc=0.7969; config_count=8; tuning_metric=PR-AUC; train_time_s=3.074; class_weight=balanced_subsample; 
+random_forest,4,roc_auc,0.8550228572741264,threshold=0.190; val_bal_acc=0.7969; config_count=8; tuning_metric=PR-AUC; train_time_s=3.074; class_weight=balanced_subsample; 
+random_forest,4,average_precision,0.594647974849762,threshold=0.190; val_bal_acc=0.7969; config_count=8; tuning_metric=PR-AUC; train_time_s=3.074; class_weight=balanced_subsample; 
+random_forest,4,training_time_seconds,3.0740402210503817,threshold=0.190; val_bal_acc=0.7969; config_count=8; tuning_metric=PR-AUC; train_time_s=3.074; class_weight=balanced_subsample; 
+gradient_boosting,4,balanced_accuracy_0.5,0.7690841009855045,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,4,balanced_accuracy_val_threshold,0.7741149985068112,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,4,roc_auc,0.8398325331373044,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,4,average_precision,0.5641249190649853,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,4,training_time_seconds,0.4205786008387804,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
+gradient_boosting,4,early_stopping_trees,90.0,threshold=0.450; val_bal_acc=0.7913; config_count=8; tuning_metric=PR-AUC; train_time_s=0.421; early_stopping_trees=90; early_stopping_source=sklearn_internal_validation; class_weight=balanced; 
