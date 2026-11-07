@@ -50,8 +50,8 @@ Values below are mean ± sample standard deviation over the 5 seeds, read from `
 | --- | --- | --- | --- | --- | --- |
 | Dummy prior | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.500 ± 0.000 | 0.190 ± 0.000 | 0.001 ± 0.000 |
 | Logistic regression | 0.759 ± 0.013 | 0.756 ± 0.010 | 0.817 ± 0.008 | 0.499 ± 0.017 | 0.015 ± 0.001 |
-| Random forest | 0.638 ± 0.014 | 0.783 ± 0.011 | 0.847 ± 0.009 | 0.565 ± 0.018 | 2.701 ± 0.066 |
-| Gradient boosting | 0.761 ± 0.011 | 0.764 ± 0.009 | 0.836 ± 0.006 | 0.531 ± 0.024 | 0.419 ± 0.135 |
+| Random forest | 0.638 ± 0.014 | 0.783 ± 0.011 | 0.847 ± 0.009 | 0.565 ± 0.018 | 2.889 ± 0.154 |
+| Gradient boosting | 0.761 ± 0.011 | 0.764 ± 0.009 | 0.836 ± 0.006 | 0.531 ± 0.024 | 0.460 ± 0.151 |
 
 The RF beat GB in PR-AUC on every paired seed. Paired differences (RF − GB): seed 0: +0.021, seed 1: +0.037, seed 2: +0.050, seed 3: +0.034, seed 4: +0.031; mean ± SD: +0.035 ± 0.010. Possible explanations—not established causes—include the small de-duplicated dataset, noisy subjective sensory labels, unstable GB early stopping (38–235 trees across the recorded seeds), and the small tuning grid.
 
@@ -133,7 +133,7 @@ python3 -m venv .venv
 ./run_all.sh
 ```
 
-The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took not recorded yet for a clean-clone install-and-run. Hardware/software: See the measured fresh-clone run recorded in results/reproducibility.json.
+The run downloads the UCI CSVs, trains all saved seeds, regenerates result CSV/JSON files and figures, writes this README, and builds [report/report.pdf](./report/report.pdf). The measured fresh-clone total (clone, environment creation, dependency install, and `./run_all.sh`) took 383 seconds (6.4 minutes). Hardware/software: 32 logical CPUs, 30.8 GiB RAM; Linux-4.18.0-514.el8.x86_64-x86_64-with-glibc2.28; Python 3.14.7.
 
 Useful outputs: `results/metrics.csv`, `results/predictions_seed*.csv`, `results/domain_shift_metrics.csv`, `results/error_analysis.json`, and `results/figures/`. To check the report/demo materials, see [demo outline](./report/demo_outline.md) and [viva questions](./docs/viva_questions.md).
 

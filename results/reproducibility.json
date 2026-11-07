@@ -1,0 +1,8 @@
+{
+  "clone_install_and_run_seconds": 382.61,
+  "python_version": "3.14.7",
+  "platform": "Linux-4.18.0-514.el8.x86_64-x86_64-with-glibc2.28",
+  "cpu_count": 32,
+  "memory_gib": 30.795249938964844,
+  "command": "git clone --no-hardlinks; python3 -m venv .venv; .venv/bin/pip install -r requirements.txt; ./run_all.sh"
+}
