@@ -23,7 +23,13 @@ from sklearn.metrics import (
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.data import FEATURE_COLUMNS, get_training_sets, load_wine_dataset, summarize_duplicates
+from src.data import (
+    FEATURE_COLUMNS,
+    duplicate_counts,
+    get_training_sets,
+    load_wine_dataset,
+    summarize_duplicates,
+)
 from src.models import make_hist_gradient_boosting_model, make_random_forest_model
 from src.train import (
     SEEDS,
@@ -50,6 +56,36 @@ def build_model(name: str, params: dict, seed: int):
     if name == "gradient_boosting":
         return make_hist_gradient_boosting_model(random_state=seed, **params)
     raise ValueError(f"Unsupported model: {name}")
+
+
+def save_dataset_summary(raw: pd.DataFrame, clean: pd.DataFrame) -> None:
+    type_summary = {}
+    for is_red, label in ((0, "white"), (1, "red")):
+        group = clean[clean["is_red"] == is_red]
+        type_summary[label] = {
+            "rows": int(len(group)),
+            "good_wines": int(group["good"].sum()),
+            "good_wine_rate": float(group["good"].mean()),
+        }
+    split = pd.read_csv(RESULTS / "split_seed0.csv")
+    summary = {
+        **duplicate_counts(raw),
+        "good_wine_rate_before": float(raw["good"].mean()),
+        "good_wine_rate_after": float(clean["good"].mean()),
+        "good_wines_after": int(clean["good"].sum()),
+        "wine_type_after": type_summary,
+        "split_rows_seed0": {
+            name: int((split["split"] == name).sum())
+            for name in ("train", "val", "test")
+        },
+        "split_fractions_seed0": {
+            name: float((split["split"] == name).mean())
+            for name in ("train", "val", "test")
+        },
+        "features": FEATURE_COLUMNS,
+        "is_red_is_model_feature": False,
+    }
+    (RESULTS / "dataset_summary.json").write_text(json.dumps(summary, indent=2))
 
 
 def save_eda(raw: pd.DataFrame, clean: pd.DataFrame) -> None:
@@ -133,6 +169,8 @@ def save_seed0_curves_and_confusions(predictions: pd.DataFrame) -> None:
     plt.close(fig)
 
     for name in MODEL_LABELS:
+        if name == "trivial_prior":
+            continue
         model = seed0[seed0["model"] == name]
         threshold = float(model["threshold"].iloc[0])
         predicted = (model["probability"].to_numpy() >= threshold).astype(int)
@@ -293,6 +331,7 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
             target_test_idx = split_indices["test"][
                 clean.iloc[split_indices["test"]]["is_red"].to_numpy() == target_flag
             ]
+            target_domain = clean.loc[clean["is_red"] == target_flag]
             for name in MODELS:
                 tuner = tune_random_forest if name == "random_forest" else tune_gradient_boosting
                 model, selected_params, config_count = tuner(
@@ -310,8 +349,10 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
                 for evaluation_color, test_frame, role in [
                     (source_color, source_test, "source_in_domain_test"),
                     (target_color, target_test, "target_domain_test"),
+                    (target_color, target_domain, "target_full_domain"),
                 ]:
                     probability = model.predict_proba(test_frame[FEATURE_COLUMNS])[:, 1]
+                    pr_auc = float(average_precision_score(test_frame["good"], probability))
                     rows.append({
                         "seed": seed,
                         "model": name,
@@ -323,7 +364,8 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
                             balanced_accuracy_score(test_frame["good"], probability >= threshold)
                         ),
                         "roc_auc": float(roc_auc_score(test_frame["good"], probability)),
-                        "pr_auc": float(average_precision_score(test_frame["good"], probability)),
+                        "pr_auc": pr_auc,
+                        "pr_auc_lift_over_base_rate": pr_auc / float(test_frame["good"].mean()),
                         "good_wine_rate": float(test_frame["good"].mean()),
                         "positive_count": int(test_frame["good"].sum()),
                         "n_test": len(test_frame),
@@ -356,11 +398,14 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
     features.to_csv(RESULTS / "domain_feature_comparison.csv", index=False)
 
     series = [
-        ("mixed", "Mixed-domain test", "#4778a8"),
-        ("source", "Source-only model, source test", "#45a878"),
-        ("target", "Source-only model, target test", "#e08a3b"),
+        ("mixed", "Mixed-domain in-domain test", "#4778a8"),
+        ("target_slice", "Source-only model, target 20% test slice", "#45a878"),
+        ("target_full", "Source-only model, entire target domain", "#e08a3b"),
     ]
-    roles = {"source": "source_in_domain_test", "target": "target_domain_test"}
+    roles = {
+        "target_slice": "target_domain_test",
+        "target_full": "target_full_domain",
+    }
     metric_fields = [
         ("balanced_accuracy_at_source_threshold", "mixed_domain_test_balanced_accuracy", "Balanced accuracy"),
         ("roc_auc", "mixed_domain_test_roc_auc", "ROC-AUC"),
@@ -377,7 +422,7 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
                 rows_for_model = domain[(domain["direction"] == direction) & (domain["model"] == name)]
                 grouped_values["mixed"]["mean"].append(float(rows_for_model[mixed_metric].mean()))
                 grouped_values["mixed"]["std"].append(float(rows_for_model[mixed_metric].std()))
-                for series_name in ("source", "target"):
+                for series_name in ("target_slice", "target_full"):
                     evaluation = rows_for_model[rows_for_model["evaluation_role"] == roles[series_name]]
                     grouped_values[series_name]["mean"].append(float(evaluation[transfer_metric].mean()))
                     grouped_values[series_name]["std"].append(float(evaluation[transfer_metric].std()))
@@ -398,7 +443,37 @@ def run_domain_shift(clean: pd.DataFrame, importance: pd.DataFrame) -> None:
 
 
 def run_error_analysis(predictions: pd.DataFrame, clean: pd.DataFrame) -> None:
-    seed0 = predictions[(predictions["seed"] == 0) & (predictions["model"] == "random_forest")].copy()
+    rf_predictions = predictions[predictions["model"] == "random_forest"].copy()
+    if not np.array_equal(
+        rf_predictions["y_true"].to_numpy(),
+        (rf_predictions["quality"].to_numpy() >= 7).astype(int),
+    ):
+        raise AssertionError("Actual good labels disagree with quality for saved RF predictions.")
+    rf_predictions["predicted_good"] = (
+        rf_predictions["probability"] >= rf_predictions["threshold"]
+    ).astype(int)
+    seed_metrics = []
+    for seed, group in rf_predictions.groupby("seed", sort=True):
+        actual = group["y_true"].to_numpy()
+        predicted = group["predicted_good"].to_numpy()
+        tp = int(((actual == 1) & (predicted == 1)).sum())
+        fp = int(((actual == 0) & (predicted == 1)).sum())
+        fn = int(((actual == 1) & (predicted == 0)).sum())
+        tn = int(((actual == 0) & (predicted == 0)).sum())
+        seed_metrics.append({
+            "seed": int(seed),
+            "threshold": float(group["threshold"].iloc[0]),
+            "test_rows": int(len(group)),
+            "tp": tp,
+            "fp": fp,
+            "fn": fn,
+            "tn": tn,
+            "precision_good": tp / (tp + fp) if tp + fp else 0.0,
+            "recall_good": tp / (tp + fn) if tp + fn else 0.0,
+        })
+    if len(seed_metrics) != len(SEEDS):
+        raise AssertionError(f"Expected RF predictions for all {len(SEEDS)} seeds.")
+    seed0 = rf_predictions[rf_predictions["seed"] == 0].copy()
     metadata = clean[["quality", "good", "is_red", *FEATURE_COLUMNS]].copy()
     metadata.index.name = "sample_index"
     seed0 = seed0.drop(columns=["quality", "is_red"], errors="ignore").merge(
@@ -465,6 +540,23 @@ def run_error_analysis(predictions: pd.DataFrame, clean: pd.DataFrame) -> None:
             "distance_from_threshold", ascending=False
         ).head(5),
     ])
+    fp_alcohol = error_examples.loc[
+        error_examples["error_type"] == "False positive", "alcohol"
+    ]
+    fn_alcohol = error_examples.loc[
+        error_examples["error_type"] == "False negative", "alcohol"
+    ]
+    metric_names = ("tp", "fp", "fn", "tn", "precision_good", "recall_good")
+    all_seed_summary = {
+        metric: {
+            "mean": float(np.mean([row[metric] for row in seed_metrics])),
+            "std": float(np.std([row[metric] for row in seed_metrics], ddof=1)),
+        }
+        for metric in metric_names
+    }
+    quality_6_or_7_errors = sum(
+        quality_counts.get(str(quality), {}).get("errors", 0) for quality in (6, 7)
+    )
     summary = {
         "model": "random_forest",
         "seed": 0,
@@ -474,6 +566,29 @@ def run_error_analysis(predictions: pd.DataFrame, clean: pd.DataFrame) -> None:
         "error_rate": float(seed0["is_error"].mean()),
         "error_counts_by_quality": quality_counts,
         "error_rate_by_wine_type": color_rates,
+        "quality_6_or_7_errors": quality_6_or_7_errors,
+        "other_quality_errors": int(len(errors) - quality_6_or_7_errors),
+        "quality_6_or_7_share_of_errors": (
+            quality_6_or_7_errors / len(errors) if len(errors) else 0.0
+        ),
+        "alcohol_by_confident_error_group": {
+            "false_positives": {
+                "count": int(len(fp_alcohol)),
+                "mean": float(fp_alcohol.mean()),
+            },
+            "false_negatives": {
+                "count": int(len(fn_alcohol)),
+                "mean": float(fn_alcohol.mean()),
+            },
+        },
+        "good_class_confusion_and_precision_recall": {
+            "seed_0": seed_metrics[0],
+            "all_seeds": {
+                "seed_count": len(seed_metrics),
+                "per_seed": seed_metrics,
+                "mean_std": all_seed_summary,
+            },
+        },
     }
     with (RESULTS / "error_analysis.json").open("w") as f:
         json.dump(summary, f, indent=2)
@@ -494,6 +609,7 @@ def main() -> None:
         path.unlink()
     raw = load_wine_dataset(ROOT / "data" / "raw")
     _, _, clean = summarize_duplicates(raw)
+    save_dataset_summary(raw, clean)
     with (RESULTS / "model_configs.json").open() as f:
         configs = json.load(f)["0"]
     predictions = pd.concat(
